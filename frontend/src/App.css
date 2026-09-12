@@ -1,0 +1,14 @@
+/* Bahari Global Holdings — App level styles (Tailwind handles most). */
+.App { min-height: 100vh; }
+
+/* Decorative gold corner accent */
+.gold-corner { position: relative; }
+.gold-corner::before, .gold-corner::after {
+  content: '';
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(200, 162, 74, 0.7);
+}
+.gold-corner::before { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+.gold-corner::after { bottom: 8px; right: 8px; border-left: none; border-top: none; }
