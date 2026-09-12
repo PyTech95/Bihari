@@ -1,0 +1,29 @@
+{
+  "summary": "Frontend-only bug-fix verification for the Bahari Global Holdings marketing site. Confirmed the Home slice/map TypeError is resolved, all list-driven routes load, the Emergent badge is fully removed, and the quote write flow (POST /api/quotes) works.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "All routes (framer-motion useScroll)", "issues": ["Console warning: 'Please ensure that the container has a non-static position, like relative, fixed, or absolute to ensure scroll offset is calculated correctly.' Non-blocking, but should be silenced by adding position: relative to the scroll target container."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "(Optional) Silence framer-motion useScroll warning by ensuring the tracked container has non-static position.",
+    "(Optional) Two 403 resource fetches were observed (likely posthog/emergent asset scripts); benign but could be filtered."
+  ],
+  "critical_code_review_comments": [
+    "asArray() guard in /app/frontend/src/lib/api.js correctly prevents non-array responses (e.g. HTML fallback on VPS) from crashing consumers using .slice().map().",
+    "Emergent badge element (#emergent-badge) is not present in public/index.html and does not appear at runtime on any tested route.",
+    "getNewsBySlug / getCaseStudy return single objects (not arrays) and are intentionally not wrapped in asArray — correct."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped per request)", "frontend": "100%"},
+  "test_credentials": "None required (admin dashboard is public).",
+  "seed_data_creation": "Created one test quote via POST /api/quotes with company_name 'TEST_Co' (id 352d6231-4407-4048-bdb7-499b1122cf3f). Persists in backend in-memory store.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Public URL is https://bahri-secure-release.preview.emergentagent.com (from frontend/.env). The URL in the SEO tags (best-designs-1.emergent.host) returns 400/Application not found and should NOT be used for testing. Tested routes: /, /vessel-chartering, /projects, /news — all load with zero JS errors and no #emergent-badge. Home page vessel carousel (data-testid=home-vessel-carousel) rendered successfully. Only non-blocking issues are framer-motion useScroll warnings and 2x 403 for external assets.",
+  "rca of the issue": "Original 'e.slice(...).map is not a function' at Home.jsx:67 happened when the axios call for /api/vessels resolved to HTML (SPA fallback) because REACT_APP_BACKEND_URL was misconfigured on VPS. axios returned a string, and vessels.slice(0,3).map(...) crashed. Fix: getVessels/getNews/getCaseStudies now coerce with asArray() (returns [] when data is not an Array). Verified: Home loads with 3 vessel cards, no TypeError in console."
+}
